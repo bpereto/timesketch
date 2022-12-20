@@ -42,7 +42,16 @@ def configure_engine(url):
     # pylint: disable=global-statement,global-variable-not-assigned
     # TODO: Can we wrap this in a class?
     global engine, session_maker, db_session
-    engine = create_engine(url)
+    engine = create_engine(
+        url,
+        pool_pre_ping=True,
+        connect_args={
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
+        } 
+    )
     # Set the query class to our own AclBaseQuery
     session_maker.configure(
         autocommit=False, autoflush=False, bind=engine, query_cls=AclBaseQuery
